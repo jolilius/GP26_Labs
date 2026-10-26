@@ -1,0 +1,86 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{fontspec}
+$if(mainfont)$
+\setmainfont{$mainfont$}
+$else$
+\setmainfont{Latin Modern Roman}
+$endif$
+
+\usepackage[a4paper,margin=2.5cm,headheight=15pt]{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{ifthen}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+% Worksheets are read top-to-bottom like a document, not typeset like a
+% paper — a floated figure can drift away from the question that refers to
+% it. Force every figure to render exactly where it's written instead.
+\floatplacement{figure}{H}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{calc}
+
+% Pandoc marks caption-less longtables with \def\LTcaptype{none} to skip
+% numbering. Newer longtable.sty (TeX Live 2026) always \refstepcounter{s}
+% the \LTcaptype value instead of treating the literal "none" as a no-op,
+% so a plain pipe table without a caption fails with "No counter 'none'
+% defined". Defining a harmless dummy counter keeps that step a no-op.
+\newcounter{none}
+\usepackage{ragged2e}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+% Headings: source files use ## for the theme, ### for the worksheet title
+% (deliberately reversed from LaTeX's usual size order — see ../CLAUDE.md),
+% #### for each Uppgift. secnumdepth=0 turns off "0.0.1"-style numbering;
+% \paragraph is redefined as a proper block heading (default LaTeX runs it
+% into the following text, which would swallow the line break after "Uppgift 1").
+\setcounter{secnumdepth}{0}
+\titleformat{\subsection}{\normalfont\large\bfseries}{}{0pt}{}
+\titlespacing*{\subsection}{0pt}{10pt}{6pt}
+\titleformat{\subsubsection}{\normalfont\LARGE\bfseries}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{0pt}{10pt}
+\titleformat{\section}{\normalfont\LARGE\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{0pt}{10pt}
+\titleformat{\paragraph}[block]{\normalfont\bfseries}{}{0pt}{}
+\titlespacing*{\paragraph}{0pt}{12pt}{4pt}
+
+\newcommand{\Coursename}{IT00CG19 GPU Programming GP26}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\lhead{\small\bfseries\Coursename}
+$if(date)$
+\rhead{\small $date$}
+$endif$
+% Footer: bare page number on a 1-page worksheet, "X/N" once there's more
+% than one page. \pageref{LastPage} needs a second compile pass to resolve;
+% pandoc reruns the PDF engine automatically when it sees LaTeX ask for that.
+\cfoot{\small\ifthenelse{\pageref{LastPage}=1}{\thepage}{\thepage/\pageref{LastPage}}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+
+$for(header-includes)$
+$header-includes$
+$endfor$
+
+\begin{document}
+\RaggedRight
+
+$body$
+
+\end{document}
