@@ -66,6 +66,12 @@ main( int argc, char** argv)
             fprintf(stderr, "Cannot query device: %s\n", cudaGetErrorString(error));
             return EXIT_FAILURE;
         }
+        int clock_rate_khz;
+        error = cudaDeviceGetAttribute(&clock_rate_khz, cudaDevAttrClockRate, dev);
+        if (error != cudaSuccess) {
+            fprintf(stderr, "Cannot query device clock rate: %s\n", cudaGetErrorString(error));
+            return EXIT_FAILURE;
+        }
         if (dev == 0) {
             if (deviceProp.major == 9999 && deviceProp.minor == 9999)
                 printf("There is no device supporting CUDA.\n");
@@ -108,10 +114,10 @@ main( int argc, char** argv)
         printf("  Texture alignment:                             %zu bytes\n",
                deviceProp.textureAlignment);
         printf("  Clock rate:                                    %.2f GHz\n",
-               deviceProp.clockRate * 1e-6f);
+               clock_rate_khz * 1e-6f);
     #if CUDART_VERSION >= 2000
         printf("  Concurrent copy and execution:                 %s\n",
-               deviceProp.deviceOverlap ? "Yes" : "No");
+               deviceProp.asyncEngineCount > 0 ? "Yes" : "No");
     #endif
     }
     printf("\nTEST PASSED\n");
