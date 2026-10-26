@@ -36,6 +36,7 @@
 /* This sample queries the properties of the CUDA devices present in the system. */
 
 // includes, system
+#include <cuda_runtime.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -50,13 +51,21 @@ int
 main( int argc, char** argv)
 {
     int deviceCount;
-    cudaGetDeviceCount(&deviceCount);
+    cudaError_t error = cudaGetDeviceCount(&deviceCount);
+    if (error != cudaSuccess || deviceCount == 0) {
+        fprintf(stderr, "No usable CUDA device: %s\n", cudaGetErrorString(error));
+        return EXIT_FAILURE;
+    }
     if (deviceCount == 0)
         printf("There is no device supporting CUDA\n");
     int dev;
     for (dev = 0; dev < deviceCount; ++dev) {
         cudaDeviceProp deviceProp;
-        cudaGetDeviceProperties(&deviceProp, dev);
+        error = cudaGetDeviceProperties(&deviceProp, dev);
+        if (error != cudaSuccess) {
+            fprintf(stderr, "Cannot query device: %s\n", cudaGetErrorString(error));
+            return EXIT_FAILURE;
+        }
         if (dev == 0) {
             if (deviceProp.major == 9999 && deviceProp.minor == 9999)
                 printf("There is no device supporting CUDA.\n");
@@ -70,17 +79,15 @@ main( int argc, char** argv)
                deviceProp.major);
         printf("  Minor revision number:                         %d\n",
                deviceProp.minor);
-        printf("  Total amount of global memory:                 %u bytes\n",
+        printf("  Total amount of global memory:                 %zu bytes\n",
                deviceProp.totalGlobalMem);
     #if CUDART_VERSION >= 2000
         printf("  Number of multiprocessors:                     %d\n",
                deviceProp.multiProcessorCount);
-        printf("  Number of cores:                               %d\n",
-               8 * deviceProp.multiProcessorCount);
     #endif
-        printf("  Total amount of constant memory:               %u bytes\n",
+        printf("  Total amount of constant memory:               %zu bytes\n",
                deviceProp.totalConstMem);
-        printf("  Total amount of shared memory per block:       %u bytes\n",
+        printf("  Total amount of shared memory per block:       %zu bytes\n",
                deviceProp.sharedMemPerBlock);
         printf("  Total number of registers available per block: %d\n",
                deviceProp.regsPerBlock);
@@ -96,9 +103,9 @@ main( int argc, char** argv)
                deviceProp.maxGridSize[0],
                deviceProp.maxGridSize[1],
                deviceProp.maxGridSize[2]);
-        printf("  Maximum memory pitch:                          %u bytes\n",
+        printf("  Maximum memory pitch:                          %zu bytes\n",
                deviceProp.memPitch);
-        printf("  Texture alignment:                             %u bytes\n",
+        printf("  Texture alignment:                             %zu bytes\n",
                deviceProp.textureAlignment);
         printf("  Clock rate:                                    %.2f GHz\n",
                deviceProp.clockRate * 1e-6f);
@@ -108,4 +115,5 @@ main( int argc, char** argv)
     #endif
     }
     printf("\nTEST PASSED\n");
+    return EXIT_SUCCESS;
 }
