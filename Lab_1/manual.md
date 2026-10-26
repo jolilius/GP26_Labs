@@ -18,6 +18,8 @@ The purpose of this lab is to check your environment settings and to make sure y
 ssh <username>@roihu-gpu.csc.fi
 ```
 
+The SSH certificate that Roihu requires is valid for only 24 hours. If the login is refused after a day, your certificate has expired: get a new one (see the instructions on Moodle) and log in again.
+
 **Step 3:** Clone the repository you will be using for all the lab assignments from the public repository by executing the following command in the directory where you would like to put it:
 
 ```bash
