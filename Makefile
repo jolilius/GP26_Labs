@@ -8,7 +8,7 @@
 # Usage:
 #   make            build all manuals into pdf/
 #   make publish    build, then copy the PDFs into the Moodle content tree
-#                   (COURSE/sections/..., the names that the activities attach)
+#                   (COURSE/files/labs/, the names that the activities attach)
 #   make clean      remove pdf/ and stray LaTeX aux files
 #
 # Requirements: pandoc, xelatex (/Library/TeX/texbin), the Fira Sans font.
@@ -16,17 +16,17 @@
 # (sudo tlmgr install framed) - then drop --syntax-highlighting=none.
 
 COURSE   ?= /Users/jolilius/home/doc/teaching/GPU26
-SECTIONS := $(COURSE)/sections
+FILES    := $(COURSE)/files/labs
 DATE     ?= Fall 2026
 
 export PATH := /Library/TeX/texbin:$(PATH)
 
-# lab folder -> PDF name (as attached in the Moodle content tree) : section folder
-LABS := Lab_1:lab-1-manual:02-lecture-1-introduction \
-        Lab_2:lab-2-manual:04-lecture-3-multi-dimensional-grids \
-        Lab_3.1:lab-3-1-manual:10-lab-3 \
-        Lab_3.2:lab-3-2-manual:10-lab-3 \
-        Lab_4:lab-4-manual:12-lab-4
+# lab folder : PDF name (as attached in the Moodle content tree)
+LABS := Lab_1:lab-1-manual \
+        Lab_2:lab-2-manual \
+        Lab_3.1:lab-3-1-manual \
+        Lab_3.2:lab-3-2-manual \
+        Lab_4:lab-4-manual
 
 PANDOC_OPTS := --template=template/gp26-template.tex \
                --pdf-engine=xelatex \
@@ -46,9 +46,9 @@ all:
 
 publish: all
 	@for e in $(LABS); do \
-		rest=$${e#*:}; name=$${rest%%:*}; sec=$${rest#*:}; \
-		echo "pdf/$$name.pdf -> $(SECTIONS)/$$sec/"; \
-		cp "pdf/$$name.pdf" "$(SECTIONS)/$$sec/" || exit 1; \
+		name=$${e#*:}; \
+		echo "pdf/$$name.pdf -> $(FILES)/"; \
+		mkdir -p "$(FILES)"; cp "pdf/$$name.pdf" "$(FILES)/" || exit 1; \
 	done
 
 clean:
